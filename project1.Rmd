@@ -267,6 +267,94 @@ plot(diamonds_slr)
 MASS::boxcox(diamonds_slr)
 ```
 
+## Variable Transformation and Assumption Testing
+
+```{r}
+
+# Log transformation of y (price)
+diamonds <- diamonds %>%
+              mutate(ystar = log(price))
+
+diamonds_slr_ystar <-lm(ystar~carat, data=diamonds)
+par(mfrow = c(2, 2))
+plot(diamonds_slr_ystar)
+
+# log transformation of x (carat)
+
+diamonds <- diamonds %>%
+              mutate(xstar = log(carat))
+
+diamonds_slr_xystar <-lm(ystar~xstar, data=diamonds)
+par(mfrow = c(2, 2))
+plot(diamonds_slr_xystar)
+
+```
+```{r}
+summary(diamonds_slr_xystar)
+```
+
+```{r}
+## 95% CIs for all regression coefficients
+confint(diamonds_slr_xystar,level = 0.95)
+```
+
+## MLR Analysis
+
+```{r}
+##convert categorical predictor to factor
+
+diamonds <- diamonds %>%
+              mutate(color_category = factor(color_category),
+                     clarity_category = factor(clarity_category),
+                     cut = factor(cut))
+
+
+##scatterplot with separate regression lines
+diamonds %>%
+  ggplot(aes(x=xstar, y=ystar, color=color_category))+
+  geom_point()+
+  geom_smooth(method=lm, se=FALSE)+
+  labs(title="Scatterplot of Diamond Carat (log transformed) and Price (log transformed) Relationship, by Color Category")
+```
+
+```{r}
+# Model with additive effect of color category
+diamonds_carat_price_color_mlr <- lm(ystar~xstar+color_category, data=diamonds)
+summary(diamonds_carat_price_color_mlr)
+```
+```{r}
+##scatterplot with separate regression lines
+diamonds %>%
+  ggplot(aes(x=xstar, y=ystar, color=clarity_category))+
+  geom_point()+
+  geom_smooth(method=lm, se=FALSE)+
+  labs(title="Scatterplot of Diamond Carat (log transformed) and Price (log transformed) Relationship, by Clarity Category")
+```
+
+```{r}
+# Model with additive effect of clarity category
+diamonds_carat_price_clarity_mlr <- lm(ystar~xstar+clarity_category, data=diamonds)
+summary(diamonds_carat_price_clarity_mlr)
+```
+
+
+```{r}
+##scatterplot with separate regression lines
+diamonds %>%
+  ggplot(aes(x=xstar, y=ystar, color=cut))+
+  geom_point()+
+  geom_smooth(method=lm, se=FALSE)+
+  labs(title="Scatterplot of Diamond Carat (log transformed) and Price (log transformed) Relationship, by Cut Category")
+```
+
+```{r}
+
+# Model with additive effect of cut category
+diamonds_carat_price_cut_mlr <- lm(ystar~xstar+cut, data=diamonds)
+summary(diamonds_carat_price_cut_mlr)
+
+```
+
 ## Section 2
 
 
